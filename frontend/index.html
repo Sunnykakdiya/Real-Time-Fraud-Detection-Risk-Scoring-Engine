@@ -1,0 +1,347 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Real-Time Fraud Detection & Risk Scoring Engine</title>
+  <link rel="stylesheet" href="/static/styles.css" />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+</head>
+<body class="dark-theme">
+
+  <!-- Top Navigation / Header -->
+  <header class="app-header">
+    <div class="header-brand">
+      <div class="logo-icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+          <path d="m9 12 2 2 4-4"/>
+        </svg>
+      </div>
+      <div class="brand-titles">
+        <h1>SENTINEL<span>//RISK</span></h1>
+        <p class="subtitle">Real-Time Payment Fraud Scoring & Drift Telemetry Engine</p>
+      </div>
+    </div>
+    <div class="header-actions">
+      <div class="status-pill" id="api-status-pill">
+        <span class="pulse-dot"></span>
+        <span id="api-status-text">CONNECTING...</span>
+      </div>
+      <button class="icon-btn" id="refresh-all-btn" title="Refresh Telemetry">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67"/>
+        </svg>
+      </button>
+    </div>
+  </header>
+
+  <!-- KPI Strip -->
+  <section class="kpi-strip">
+    <div class="kpi-card">
+      <div class="kpi-label">CHAMPION MODEL</div>
+      <div class="kpi-value highlight-cyan" id="kpi-model">LightGBM</div>
+      <div class="kpi-sub">Sigmoid Calibrated CV</div>
+    </div>
+    <div class="kpi-card">
+      <div class="kpi-label">TEST PR-AUC</div>
+      <div class="kpi-value highlight-emerald" id="kpi-prauc">0.2028</div>
+      <div class="kpi-sub" id="kpi-rocauc">ROC-AUC: 0.8092</div>
+    </div>
+    <div class="kpi-card">
+      <div class="kpi-label">COST-OPTIMAL THRESHOLD</div>
+      <div class="kpi-value highlight-amber" id="kpi-threshold">0.020</div>
+      <div class="kpi-sub" id="kpi-savings">Net Savings: $21,305</div>
+    </div>
+    <div class="kpi-card">
+      <div class="kpi-label">MEDIAN LATENCY</div>
+      <div class="kpi-value highlight-blue" id="kpi-latency">~12 ms</div>
+      <div class="kpi-sub">SHAP TreeExplainer Online</div>
+    </div>
+    <div class="kpi-card">
+      <div class="kpi-label">FEATURE DRIFT HEALTH</div>
+      <div class="kpi-value highlight-emerald" id="kpi-drift-status">HEALTHY</div>
+      <div class="kpi-sub" id="kpi-drift-sub">15 Features Monitored</div>
+    </div>
+  </section>
+
+  <!-- Main Grid Layout -->
+  <main class="dashboard-grid">
+
+    <!-- Column 1: Scorer & Presets -->
+    <section class="panel transaction-scorer-panel">
+      <div class="panel-header">
+        <div class="panel-title-wrap">
+          <span class="panel-tag">INGESTION</span>
+          <h2>Payment Transaction Scorer</h2>
+        </div>
+        <span class="caption">Zero-Skew Online Entity Lookup</span>
+      </div>
+
+      <!-- Presets Selector -->
+      <div class="presets-section">
+        <label class="section-label">One-Click Realistic Presets:</label>
+        <div class="presets-grid" id="presets-container">
+          <!-- Populated by JavaScript -->
+          <button class="preset-btn loading">Loading presets...</button>
+        </div>
+      </div>
+
+      <!-- Transaction Form -->
+      <form id="transaction-form" class="transaction-form">
+        <div class="form-row two-col">
+          <div class="form-group">
+            <label for="input-amt">Transaction Amount ($)</label>
+            <div class="input-prefix-wrap">
+              <span class="input-prefix">$</span>
+              <input type="number" id="input-amt" step="0.01" min="0.01" value="149.99" required />
+            </div>
+          </div>
+          <div class="form-group">
+            <label for="input-product">Product Category</label>
+            <select id="input-product">
+              <option value="W" selected>W - Retail Merchandise</option>
+              <option value="C">C - Online Digital Payment</option>
+              <option value="R">R - Real-Time Remittance</option>
+              <option value="H">H - High-Value Merchant</option>
+              <option value="S">S - Subscription Billing</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="form-row three-col">
+          <div class="form-group">
+            <label for="input-card1">Card Entity ID (card1)</label>
+            <input type="number" id="input-card1" value="10045" min="1000" max="99999" required />
+            <small class="helper-text" id="card-stats-preview">Known card lookup active</small>
+          </div>
+          <div class="form-group">
+            <label for="input-card4">Card Brand</label>
+            <select id="input-card4">
+              <option value="visa" selected>Visa</option>
+              <option value="mastercard">MasterCard</option>
+              <option value="discover">Discover</option>
+              <option value="american express">Amex</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label for="input-card6">Card Type</label>
+            <select id="input-card6">
+              <option value="debit" selected>Debit</option>
+              <option value="credit">Credit</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="form-row two-col">
+          <div class="form-group">
+            <label for="input-p-email">Purchaser Email Domain</label>
+            <input type="text" id="input-p-email" value="gmail.com" placeholder="e.g. gmail.com" />
+          </div>
+          <div class="form-group">
+            <label for="input-r-email">Recipient Email Domain</label>
+            <input type="text" id="input-r-email" value="" placeholder="Optional (e.g. yahoo.com)" />
+          </div>
+        </div>
+
+        <div class="form-row two-col">
+          <div class="form-group">
+            <label for="input-device">Device Type</label>
+            <select id="input-device">
+              <option value="desktop" selected>Desktop (Windows / Mac)</option>
+              <option value="mobile">Mobile (iOS / Android)</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label for="input-hour">Transaction Hour (UTC)</label>
+            <input type="number" id="input-hour" min="0" max="23" value="14" />
+          </div>
+        </div>
+
+        <div class="form-group threshold-override-group">
+          <div class="slider-header">
+            <label for="input-threshold-override">Block Threshold Override (Optional):</label>
+            <span class="threshold-display" id="threshold-override-val">Model Default</span>
+          </div>
+          <input type="range" id="input-threshold-override" min="0.005" max="0.30" step="0.005" value="0.02" />
+          <div class="slider-scale">
+            <span>Aggressive (0.005)</span>
+            <span>Optimal (0.020)</span>
+            <span>Permissive (0.300)</span>
+          </div>
+        </div>
+
+        <button type="submit" class="submit-score-btn" id="submit-btn">
+          <span class="btn-spinner" id="btn-spinner"></span>
+          <span class="btn-text">EVALUATE TRANSACTION RISK</span>
+        </button>
+      </form>
+    </section>
+
+    <!-- Column 2: Decision & SHAP Explainability -->
+    <section class="panel decision-shap-panel">
+      <div class="panel-header">
+        <div class="panel-title-wrap">
+          <span class="panel-tag">INFERENCE & EXPLAINABILITY</span>
+          <h2>Real-Time Risk Decision</h2>
+        </div>
+        <span class="caption" id="tx-id-badge">ID: txn_standby</span>
+      </div>
+
+      <!-- Decision Banner -->
+      <div class="decision-hero" id="decision-hero">
+        <div class="gauge-container">
+          <svg class="gauge-svg" viewBox="0 0 200 120">
+            <!-- Gauge background arc -->
+            <path class="gauge-bg" d="M 20 100 A 80 80 0 0 1 180 100" />
+            <!-- Gauge colored fill arc -->
+            <path class="gauge-fill" id="gauge-fill" d="M 20 100 A 80 80 0 0 1 180 100" />
+            <!-- Needle pointer -->
+            <line class="gauge-needle" id="gauge-needle" x1="100" y1="100" x2="100" y2="30" />
+            <circle cx="100" cy="100" r="6" class="gauge-hub" />
+          </svg>
+          <div class="gauge-score-wrap">
+            <span class="gauge-score" id="gauge-score-value">0.0%</span>
+            <span class="gauge-label">FRAUD PROBABILITY</span>
+          </div>
+        </div>
+
+        <div class="decision-details">
+          <div class="decision-tier-badge" id="decision-tier-badge">READY TO SCORE</div>
+          <div class="recommended-action" id="recommended-action-text">Submit payment payload for evaluation</div>
+          <div class="decision-meta-row">
+            <span class="meta-item">Latency: <strong id="latency-value">-- ms</strong></span>
+            <span class="meta-item">Threshold: <strong id="threshold-used-value">--</strong></span>
+          </div>
+        </div>
+      </div>
+
+      <!-- SHAP Explainability Breakdown -->
+      <div class="shap-container">
+        <div class="shap-header">
+          <h3>Top SHAP Risk Attribution Factors</h3>
+          <span class="shap-subtitle">Local feature attributions for this transaction</span>
+        </div>
+
+        <div class="shap-bars-list" id="shap-bars-list">
+          <div class="empty-state">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+              <path d="M3 3v18h18"/>
+              <path d="m19 9-5 5-4-4-3 3"/>
+            </svg>
+            <p>Score a transaction above or click a preset to see the top 5 human-readable SHAP drivers.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- Secondary Row: Benchmarks, Drift Telemetry & Audit Log -->
+  <section class="secondary-grid">
+
+    <!-- Benchmark Comparison Table -->
+    <div class="panel">
+      <div class="panel-header">
+        <div class="panel-title-wrap">
+          <span class="panel-tag">OFFLINE VALIDATION</span>
+          <h3>Model Benchmark Comparison</h3>
+        </div>
+        <span class="caption">Holdout Test Split (No SMOTE / Chronological)</span>
+      </div>
+      <div class="table-responsive">
+        <table class="data-table" id="benchmark-table">
+          <thead>
+            <tr>
+              <th>Model Architecture</th>
+              <th>PR-AUC</th>
+              <th>ROC-AUC</th>
+              <th>Brier Score</th>
+              <th>F1 Score</th>
+              <th>Net Savings</th>
+            </tr>
+          </thead>
+          <tbody id="benchmark-tbody">
+            <tr><td colspan="6" class="text-center">Loading model benchmarks...</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Feature Drift Table -->
+    <div class="panel">
+      <div class="panel-header">
+        <div class="panel-title-wrap">
+          <span class="panel-tag">COVARIATE SHIFT</span>
+          <h3>Feature Drift Monitoring (PSI / KS)</h3>
+        </div>
+        <span class="caption">Baseline vs Holdout Production Split</span>
+      </div>
+      <div class="table-responsive">
+        <table class="data-table" id="drift-table">
+          <thead>
+            <tr>
+              <th>Feature</th>
+              <th>PSI Index</th>
+              <th>KS p-value</th>
+              <th>Ref Mean</th>
+              <th>Target Mean</th>
+              <th>Drift Status</th>
+            </tr>
+          </thead>
+          <tbody id="drift-tbody">
+            <tr><td colspan="6" class="text-center">Loading drift analysis...</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+  </section>
+
+  <!-- Full-Width Bottom Row: Audit Log History -->
+  <section class="panel audit-log-panel">
+    <div class="panel-header">
+      <div class="panel-title-wrap">
+        <span class="panel-tag">AUDIT TRAIL</span>
+        <h3>Recent Scored Transactions (SQLite Log)</h3>
+      </div>
+      <button class="small-outline-btn" id="refresh-audit-btn">Refresh History</button>
+    </div>
+    <div class="table-responsive">
+      <table class="data-table" id="audit-table">
+        <thead>
+          <tr>
+            <th>Txn ID</th>
+            <th>Timestamp</th>
+            <th>Amount</th>
+            <th>Card Issuer</th>
+            <th>Product</th>
+            <th>Fraud Probability</th>
+            <th>Tier</th>
+            <th>Decision Action</th>
+            <th>Latency</th>
+            <th>Top Risk Driver</th>
+          </tr>
+        </thead>
+        <tbody id="audit-tbody">
+          <tr><td colspan="10" class="text-center">No transactions scored yet in this session.</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer class="app-footer">
+    <p>Real-Time Fraud Detection & Risk Scoring Engine &bull; FastAPI + Scikit-Learn + LightGBM + XGBoost + SHAP</p>
+    <div class="footer-links">
+      <a href="/docs" target="_blank">Interactive Swagger Docs</a> &bull;
+      <a href="/health" target="_blank">Health Status</a> &bull;
+      <a href="/drift" target="_blank">Drift JSON</a>
+    </div>
+  </footer>
+
+  <script src="/static/app.js"></script>
+</body>
+</html>

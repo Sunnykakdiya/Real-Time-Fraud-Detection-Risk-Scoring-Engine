@@ -1,0 +1,26 @@
+{
+  "block_threshold": 0.02,
+  "review_threshold": 0.009,
+  "fp_review_cost": 5.0,
+  "fn_multiplier": 1.0,
+  "optimal_net_savings": 23532.53,
+  "savings_percentage": 69.07,
+  "action_tiers": {
+    "LOW": {
+      "action": "APPROVE",
+      "max_score": 0.009,
+      "description": "Legitimate transaction. Automatically cleared without customer friction."
+    },
+    "MEDIUM": {
+      "action": "REVIEW",
+      "min_score": 0.009,
+      "max_score": 0.02,
+      "description": "Moderate risk signals. Routed to 3D-Secure challenge or manual analyst review."
+    },
+    "HIGH": {
+      "action": "BLOCK",
+      "min_score": 0.02,
+      "description": "Critical risk score exceeding cost-optimal loss threshold. Payment declined."
+    }
+  }
+}

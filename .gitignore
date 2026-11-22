@@ -1,0 +1,40 @@
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+
+# Data
+data/raw/
+data/processed/
+*.parquet
+*.csv
+
+# ML models and artifacts
+models/*.joblib
+models/*.onnx
+mlruns/
+.mlflow/
+
+# Environment and secrets
+.env
+.venv/
+env/
+venv/
+ENV/
+
+# Testing and coverage
+.pytest_cache/
+.coverage
+htmlcov/
+
+# Logs and databases
+*.log
+*.db
+*.sqlite3
+
+# IDE and OS
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db

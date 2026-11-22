@@ -1,0 +1,145 @@
+{
+  "timestamp": "2026-11-21T07:01:23.076350Z",
+  "overall_status": "WARNING",
+  "total_features_monitored": 15,
+  "stable_count": 13,
+  "moderate_drift_count": 1,
+  "high_drift_count": 1,
+  "features": [
+    {
+      "feature": "transaction_day_of_week",
+      "psi": 1.3085,
+      "ks_statistic": 0.1957,
+      "p_value": 0.0,
+      "status": "HIGH_DRIFT",
+      "ref_mean": 2.8908,
+      "target_mean": 3.6075
+    },
+    {
+      "feature": "amt_to_card_zscore",
+      "psi": 0.1064,
+      "ks_statistic": 0.0565,
+      "p_value": 0.0,
+      "status": "MODERATE_DRIFT",
+      "ref_mean": -0.0,
+      "target_mean": 0.336
+    },
+    {
+      "feature": "card_txn_count",
+      "psi": 0.095,
+      "ks_statistic": 0.0844,
+      "p_value": 0.0,
+      "status": "STABLE",
+      "ref_mean": 87.165,
+      "target_mean": 86.2747
+    },
+    {
+      "feature": "amt_to_card_mean_ratio",
+      "psi": 0.0707,
+      "ks_statistic": 0.0557,
+      "p_value": 0.0,
+      "status": "STABLE",
+      "ref_mean": 1.0,
+      "target_mean": 1.3133
+    },
+    {
+      "feature": "hour_cos",
+      "psi": 0.006,
+      "ks_statistic": 0.0309,
+      "p_value": 0.0054,
+      "status": "STABLE",
+      "ref_mean": -0.0035,
+      "target_mean": -0.0479
+    },
+    {
+      "feature": "transaction_hour",
+      "psi": 0.0042,
+      "ks_statistic": 0.0226,
+      "p_value": 0.0834,
+      "status": "STABLE",
+      "ref_mean": 11.4776,
+      "target_mean": 11.6133
+    },
+    {
+      "feature": "hour_sin",
+      "psi": 0.0037,
+      "ks_statistic": 0.0161,
+      "p_value": 0.3993,
+      "status": "STABLE",
+      "ref_mean": 0.0026,
+      "target_mean": -0.0116
+    },
+    {
+      "feature": "TransactionAmt",
+      "psi": 0.0035,
+      "ks_statistic": 0.0228,
+      "p_value": 0.0799,
+      "status": "STABLE",
+      "ref_mean": 116.6876,
+      "target_mean": 115.0579
+    },
+    {
+      "feature": "log_transaction_amt",
+      "psi": 0.0035,
+      "ks_statistic": 0.0228,
+      "p_value": 0.0799,
+      "status": "STABLE",
+      "ref_mean": 4.2266,
+      "target_mean": 4.2019
+    },
+    {
+      "feature": "amt_decimal_cents",
+      "psi": 0.0019,
+      "ks_statistic": 0.0199,
+      "p_value": 0.1723,
+      "status": "STABLE",
+      "ref_mean": 0.4358,
+      "target_mean": 0.4456
+    },
+    {
+      "feature": "ProductCD_freq",
+      "psi": 0.0015,
+      "ks_statistic": 0.0105,
+      "p_value": 0.8794,
+      "status": "STABLE",
+      "ref_mean": 0.5781,
+      "target_mean": 0.5847
+    },
+    {
+      "feature": "id_null_count",
+      "psi": 0.0002,
+      "ks_statistic": 0.0107,
+      "p_value": 0.8685,
+      "status": "STABLE",
+      "ref_mean": 5.4695,
+      "target_mean": 5.5445
+    },
+    {
+      "feature": "time_since_last_card_txn",
+      "psi": 0.0,
+      "ks_statistic": 1.0,
+      "p_value": 0.0,
+      "status": "STABLE",
+      "ref_mean": 0.0,
+      "target_mean": 943620.1285
+    },
+    {
+      "feature": "email_domain_match",
+      "psi": 0.0,
+      "ks_statistic": 0.0009,
+      "p_value": 1.0,
+      "status": "STABLE",
+      "ref_mean": 0.1346,
+      "target_mean": 0.1355
+    },
+    {
+      "feature": "R_emaildomain_isna",
+      "psi": 0.0,
+      "ks_statistic": 0.0,
+      "p_value": 1.0,
+      "status": "STABLE",
+      "ref_mean": 0.0,
+      "target_mean": 0.0
+    }
+  ]
+}
